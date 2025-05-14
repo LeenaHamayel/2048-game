@@ -142,3 +142,49 @@ KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
   button.addEventListener("click", fn.bind(this));
   button.addEventListener(this.eventTouchend, fn.bind(this));
 };
+// 🧠 1. تعريف مصفوفة لتخزين الحركات
+window.moves = [];
+
+// 🕹️ 2. تتبع مفاتيح الأسهم وتسجيل الحركات مع الوقت
+document.addEventListener("keydown", function (event) {
+  const keyMap = {
+    37: "left",
+    38: "up",
+    39: "right",
+    40: "down"
+  };
+
+  if (keyMap[event.which]) {
+    const move = keyMap[event.which];
+    const timestamp = new Date().toISOString();
+    window.moves.push({ move, time: timestamp });
+    console.log(`تم تسجيل حركة: ${move} في ${timestamp}`);
+  }
+});
+
+// 📦 3. وظيفة لتحميل البيانات كملف JSON
+function downloadMovesData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.moves, null, 2));
+  const dlAnchorElem = document.createElement("a");
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", "player_moves.json");
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  document.body.removeChild(dlAnchorElem);
+}
+
+// 🖱️ 4. إنشاء زر في الزاوية العليا
+const downloadButton = document.createElement("button");
+downloadButton.innerText = "Download Player Data";
+downloadButton.style.position = "absolute";
+downloadButton.style.top = "10px";
+downloadButton.style.right = "10px";
+downloadButton.style.zIndex = 9999;
+downloadButton.style.padding = "10px";
+downloadButton.style.backgroundColor = "#2ecc71";
+downloadButton.style.color = "white";
+downloadButton.style.border = "none";
+downloadButton.style.borderRadius = "5px";
+downloadButton.style.cursor = "pointer";
+downloadButton.onclick = downloadMovesData;
+document.body.appendChild(downloadButton);
